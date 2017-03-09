@@ -49,12 +49,16 @@ var player = function(name, color) {
         return this.score.re + " + " + this.score.im + "i (" + this.getAbsoluteScore() + ")"; 
     };
     this.createView = function(wrapper) {
+	// make a new div to hold all the css
         var div = document.createElement("DIV");
         div.classList.add(PLAYER_CLASS_NAME);
+	// the title is an h3
         var titleChild = document.createElement("H3");
+	// populate it with the player's name
         titleChild.appendChild(document.createTextNode(this.name));
         titleChild.classList.add(PLAYER_NAME_CLASS_NAME);
         div.appendChild(titleChild);
+	// make a new p to hold the score
         var scoreChild = document.createElement("P");
         scoreChild.appendChild(document.createTextNode(this.scoreString()));
         scoreChild.classList.add(PLAYER_SCORE_CLASS_NAME);
@@ -71,6 +75,25 @@ var player = function(name, color) {
             return false;
         }
     };
+    this.calculateRoundScore = function() {
+        var roundScore = math.complex({re: 0, im: 0});
+	var jackOfClubsFlag = false;
+	for card in this.cardsForRound {
+	    roundScore.re += cardsForRound[card].re;
+	    roundScore.im += cardsForRound[card].im;
+	    if cardsForRound[card].isJackOfClubs {
+		jackOfClubsFlag = true
+	    }
+	}
+	if jackOfClubsFlag {
+	    var newScore = math.complex({
+		re: roundScore.im * -2,
+		im: roundScore.re * 2
+	    });
+	    roundScore = newScore;
+	}
+	this.earnPoints(roundScore);
+    }
 };
 
 var card = function(strName, suit, number, className, score = 0) {
